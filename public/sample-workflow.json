@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "start",
+      "position": { "x": 80, "y": 220 },
+      "data": {
+        "type": "start",
+        "label": "Employee Onboarding Start",
+        "metadata": { "department": "Engineering", "priority": "high" }
+      }
+    },
+    {
+      "id": "n2",
+      "type": "task",
+      "position": { "x": 320, "y": 220 },
+      "data": {
+        "type": "task",
+        "label": "Complete HR Paperwork",
+        "description": "New hire fills in tax forms, emergency contacts, and direct deposit details.",
+        "assignee": "HR Team",
+        "dueDate": "2024-02-01",
+        "customFields": { "formType": "I-9, W-4, direct deposit" }
+      }
+    },
+    {
+      "id": "n3",
+      "type": "approval",
+      "position": { "x": 570, "y": 220 },
+      "data": {
+        "type": "approval",
+        "label": "Manager Sign-off",
+        "approverRole": "Manager",
+        "approverName": "Jane Smith",
+        "autoApproveThreshold": 3,
+        "rejectionAction": "send_back"
+      }
+    },
+    {
+      "id": "n4",
+      "type": "automatedStep",
+      "position": { "x": 820, "y": 220 },
+      "data": {
+        "type": "automatedStep",
+        "label": "Send Welcome Email",
+        "actionId": "send_email",
+        "actionLabel": "Send Email",
+        "params": {
+          "recipient": "new_hire@company.com",
+          "template": "welcome_onboarding"
+        },
+        "maxRetries": 2,
+        "retryDelaySeconds": 30
+      }
+    },
+    {
+      "id": "n5",
+      "type": "automatedStep",
+      "position": { "x": 820, "y": 380 },
+      "data": {
+        "type": "automatedStep",
+        "label": "Create Jira Account",
+        "actionId": "create_jira",
+        "actionLabel": "Create Jira Ticket",
+        "params": {
+          "project": "ONBOARD",
+          "summary": "New hire equipment request"
+        },
+        "maxRetries": 3,
+        "retryDelaySeconds": 60
+      }
+    },
+    {
+      "id": "n6",
+      "type": "task",
+      "position": { "x": 1070, "y": 300 },
+      "data": {
+        "type": "task",
+        "label": "IT Equipment Setup",
+        "description": "Provision laptop, accounts, and access credentials for the new hire.",
+        "assignee": "IT Team",
+        "dueDate": "2024-02-05",
+        "customFields": { "equipmentType": "MacBook Pro M3" }
+      }
+    },
+    {
+      "id": "n7",
+      "type": "end",
+      "position": { "x": 1320, "y": 300 },
+      "data": {
+        "type": "end",
+        "label": "Onboarding Complete",
+        "endMessage": "Welcome to the team! All onboarding steps are complete.",
+        "showSummary": true
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "n1", "target": "n2", "animated": true, "style": { "stroke": "#6366f1", "strokeWidth": 2 } },
+    { "id": "e2", "source": "n2", "target": "n3", "animated": true, "style": { "stroke": "#6366f1", "strokeWidth": 2 } },
+    { "id": "e3", "source": "n3", "target": "n4", "animated": true, "style": { "stroke": "#6366f1", "strokeWidth": 2 } },
+    { "id": "e4", "source": "n3", "target": "n5", "animated": true, "style": { "stroke": "#6366f1", "strokeWidth": 2 } },
+    { "id": "e5", "source": "n4", "target": "n6", "animated": true, "style": { "stroke": "#6366f1", "strokeWidth": 2 } },
+    { "id": "e6", "source": "n5", "target": "n6", "animated": true, "style": { "stroke": "#6366f1", "strokeWidth": 2 } },
+    { "id": "e7", "source": "n6", "target": "n7", "animated": true, "style": { "stroke": "#6366f1", "strokeWidth": 2 } }
+  ]
+}

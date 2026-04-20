@@ -1,0 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────
+   Base
+───────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #0d0f1a;
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────
+   Scrollbars
+───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #141625;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e3148;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+
+/* ─────────────────────────────────────────
+   React Flow Overrides
+───────────────────────────────────────── */
+.react-flow__background {
+  background-color: #0d0f1a;
+}
+
+.react-flow__minimap {
+  background-color: #161827 !important;
+  border: 1px solid #2e3148;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.react-flow__minimap-mask {
+  fill: rgba(15, 17, 23, 0.6);
+}
+
+/* Controls */
+.react-flow__controls {
+  background: #161827 !important;
+  border: 1px solid #2e3148 !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4) !important;
+}
+
+.react-flow__controls-button {
+  background: #161827 !important;
+  border: none !important;
+  border-bottom: 1px solid #2e3148 !important;
+  color: #94a3b8 !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #1e2135 !important;
+  color: #e2e8f0 !important;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor !important;
+  max-width: 14px !important;
+  max-height: 14px !important;
+}
+
+/* Edges */
+.react-flow__edge-path {
+  stroke: #6366f1 !important;
+  stroke-width: 2 !important;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #818cf8 !important;
+}
+
+.react-flow__edge-text {
+  fill: #94a3b8 !important;
+}
+
+/* Handles */
+.react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: #6366f1 !important;
+  border: 2px solid #0d0f1a !important;
+  border-radius: 50% !important;
+  transition: all 0.15s ease;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.4);
+  background: #818cf8 !important;
+}
+
+.react-flow__handle.connectable {
+  cursor: crosshair;
+}
+
+/* Selection box */
+.react-flow__selection {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid #6366f1;
+}
+
+/* Node wrapper hover glow */
+.react-flow__node:hover .node-card {
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.4), 0 8px 24px rgba(0,0,0,0.5);
+}
+
+.react-flow__node.selected .node-card {
+  box-shadow: 0 0 0 2px #6366f1, 0 8px 24px rgba(0,0,0,0.5) !important;
+}
+
+/* Connection line */
+.react-flow__connection-path {
+  stroke: #6366f1 !important;
+  stroke-width: 2 !important;
+  stroke-dasharray: 5 5;
+}
+
+/* ─────────────────────────────────────────
+   Utility Classes
+───────────────────────────────────────── */
+.glass {
+  background: rgba(22, 24, 39, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-primary {
+  @apply bg-accent-500 hover:bg-accent-600 text-white font-medium px-4 py-2 rounded-lg
+         transition-all duration-200 flex items-center gap-2 text-sm
+         active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-ghost {
+  @apply bg-transparent hover:bg-surface-100 text-slate-400 hover:text-slate-200
+         font-medium px-3 py-1.5 rounded-lg transition-all duration-200
+         flex items-center gap-1.5 text-sm;
+}
+
+.form-label {
+  @apply text-xs font-medium text-slate-400 uppercase tracking-wider mb-1 block;
+}
+
+.form-input {
+  @apply w-full bg-surface-100 border border-surface-200 text-slate-200
+         px-3 py-2 rounded-lg text-sm outline-none
+         focus:border-accent-500 focus:ring-1 focus:ring-accent-500/30
+         placeholder:text-slate-500 transition-all duration-150;
+}
+
+.form-textarea {
+  @apply form-input resize-none;
+}
+
+.form-select {
+  @apply form-input cursor-pointer;
+}
+
+.badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+}
+
+/* ─────────────────────────────────────────
+   Animations
+───────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+  50%       { box-shadow: 0 0 0 4px rgba(99,102,241,0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out both;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #6366f1, #a78bfa, #6366f1);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ─────────────────────────────────────────
+   Tab styles
+───────────────────────────────────────── */
+.tab-btn {
+  @apply flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-400
+         border-b-2 border-transparent transition-all duration-200 cursor-pointer
+         hover:text-slate-200 whitespace-nowrap;
+}
+
+.tab-btn.active {
+  @apply text-accent-400 border-accent-500;
+}
