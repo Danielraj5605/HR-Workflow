@@ -1,165 +1,172 @@
-# FlowForge HR — Workflow Designer
+# FlowForge HR — HR Workflow Designer
 
-A visual HR workflow designer built with React, TypeScript, and React Flow. Design, validate, and simulate HR workflows with an intuitive drag-and-drop canvas.
-
-## Tech Stack
-
-| Category | Technology |
-|----------|------------|
-| Framework | React 19 + TypeScript + Vite |
-| Flow Canvas | @xyflow/react (React Flow v12) |
-| Styling | Tailwind CSS |
-| State Management | Zustand |
-| Testing | Jest + React Testing Library |
-| API Mocking | MSW (Mock Service Worker) |
+> **Tredence Full Stack Engineering Intern — Case Study Submission**
 
 ---
 
-## Project Structure
+## What It Does
 
-```
-src/
-├── api/                      # API integrations
-├── components/
-│   ├── ai/                   # AI analysis panel
-│   ├── canvas/               # Sidebar, WorkflowCanvas, CanvasToolbar
-│   ├── forms/                # Node configuration forms
-│   ├── nodes/                # Custom React Flow node components
-│   └── sandbox/              # Simulation panel & execution log
-├── hooks/                    # Custom React hooks
-├── mocks/                    # MSW handlers for API mocking
-├── types/                    # TypeScript type definitions
-└── utils/                    # Utility functions (validation, serialization)
-```
+FlowForge HR is a visual drag-and-drop HR workflow designer. HR admins can:
+
+- **Design** workflows (onboarding, leave approval, document verification) by dragging nodes onto a canvas
+- **Configure** each node with a dedicated, type-safe edit form
+- **Validate** the graph structure in real-time (cycles, disconnected nodes, missing start/end)
+- **Simulate** the workflow via a mock API and see a step-by-step execution log
+- **Analyze** the workflow with AI for issues and improvement suggestions
+- **Export / Import** workflows as JSON
 
 ---
 
-## Setup
+## AI Feature — The Differentiator
 
-### Prerequisites
+When a workflow is designed, clicking **"Analyze with AI"** sends the serialized graph to an AI provider (Anthropic Claude). The AI returns:
 
-- Node.js 18+
-- npm 9+
+- **Issues** — logical problems (e.g., approval with no predecessor task)
+- **Suggestions** — improvements based on the workflow type
+- **Summary** — a plain-English description of the entire workflow
 
-### Installation
+This is **additive** — all spec requirements are met fully before the AI layer.
+
+> **Note:** AI analysis requires an API key from your chosen provider. The mock API (simulate, automations) works without any key.
+
+---
+
+## How to Run
 
 ```bash
-# Clone the repository
-cd "D:\Personal Projects\HR Workflow"
-
-# Install dependencies
+# 1. Install dependencies
 npm install
-```
 
-### Running the Development Server
+# 2. (Optional) Enable AI analysis
+cp .env.example .env.local
+# Then add your API key to .env.local:
+# VITE_ANTHROPIC_API_KEY=sk-ant-...
 
-```bash
+# 3. Start the development server
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`. In development mode, MSW (Mock Service Worker) is automatically started to mock API responses.
+Navigate to **http://localhost:5173/**
 
-### Building for Production
+---
 
-```bash
-npm run build
+## How to Manually Test (Step by Step)
+
+### Basic Workflow
+
+1. **Add a Start node** — drag "Start" from the left sidebar onto the canvas
+2. **Add a Task node** — drag "Task" onto the canvas
+3. **Add an Approval node** — drag "Approval" onto the canvas
+4. **Add an End node** — drag "End" onto the canvas
+5. **Connect them** — hover over a node's right edge handle (blue dot), then drag to the next node's left handle
+6. **Delete** — select any node/edge and press `Delete`
+
+### Configuring Nodes
+
+7. **Click any node** — the right panel switches to the **Config** tab automatically
+8. **Start node** — edit title and add optional metadata key-value pairs
+9. **Task node** — fill in title, description, assignee name, due date, and custom fields
+10. **Approval node** — select approver role (Manager / HRBP / Director), set auto-approve threshold
+11. **Automated Step node** — choose an action from the dropdown (fetched from mock API), fill dynamic params
+12. **End node** — set end message and toggle the summary flag
+
+### Running Simulation
+
+13. Switch to the **Simulate** tab in the right panel
+14. Any validation errors (missing Start/End, cycles, disconnected nodes) are shown as a red banner
+15. Click **Run Simulation** — the mock API returns a step-by-step execution log
+16. Each step shows status (completed / pending / skipped), duration, and details
+
+### AI Analysis
+
+17. Switch to the **AI** tab in the right panel
+18. Click **Analyze with AI**
+19. If API key is set, the AI returns structured JSON with issues, suggestions, and a summary
+20. If no key is set, a clear warning is shown
+
+### Export / Import
+
+21. Click the **↓ Download** icon in the canvas toolbar to export the workflow as `workflow.json`
+22. Click the **↑ Upload** icon to import a JSON file and restore the workflow
+23. Click **Fit View** (maximize icon) to center the restored graph
+
+### Canvas Controls
+
+24. **Zoom In/Out** — toolbar buttons or scroll wheel
+25. **Minimap** — bottom-right corner of the canvas; colored by node type
+26. **Clear** — trash icon in toolbar resets the canvas
+
+---
+
+## Architecture Decisions
+
+### Why Zustand (not Redux or Context)?
+
+React Flow triggers hundreds of re-renders during node dragging. Zustand's selector-based subscriptions prevent the form panel from re-rendering while the user drags a node. Context would cause the entire tree to re-render on every position update.
+
+### Why MSW (not JSON Server)?
+
+MSW intercepts `fetch()` calls at the browser level via a Service Worker. No separate server process is needed. The mock is realistic (real HTTP semantics) and disappears cleanly in production without any code change.
+
+### Why Discriminated Union (not a flat `data: any`)?
+
+```ts
+type WorkflowNodeData = StartNodeData | TaskNodeData | ApprovalNodeData | ...
 ```
 
-### Preview Production Build
+`NodeFormPanel` switches on `data.type` and TypeScript narrows to the exact interface. No `as any`, no optional fields everywhere. Adding a new node type means adding one interface, one form, and one case — the compiler enforces completeness.
 
-```bash
-npm run preview
-```
+### Why Direct AI Provider Fetch (not LangChain/Vercel AI)?
 
----
-
-## Features
-
-### Workflow Canvas
-
-- **Drag-and-drop** node placement from sidebar
-- **5 Node Types**: Start, Task, Approval, Automated Step, End
-- **Visual connections** between nodes with React Flow edges
-- **Selection** and editing via right panel forms
-- **Delete** nodes and edges via keyboard or UI
-
-### Node Configuration Forms
-
-- **StartForm**: Label and metadata configuration
-- **TaskForm**: Label, description, assignee, due date, custom fields
-- **ApprovalForm**: Approver role, approver name, auto-approve threshold, rejection action
-- **AutomatedStepForm**: Dynamic action selection with API-fetched parameters
-- **EndForm**: End message and summary toggle
-
-### Simulation Panel
-
-- **Run Simulation** against mock API
-- **Step-by-step execution log** with status indicators
-- **Validation banner** showing workflow errors/warnings before simulation
-- **Cycle detection** and validation errors
-
-### AI Analysis Panel
-
-- Generate AI insights on workflow structure
-- Provider-agnostic architecture for LLM integration
+This is a frontend-only prototype. Adding a backend SDK just to call one API endpoint would be over-engineering. The direct `fetch()` keeps the bundle minimal and the flow transparent.
 
 ---
 
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server with MSW |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
-| `npm test` | Run all Jest tests |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run test:coverage` | Run tests with coverage report |
-
----
-
-## Key Implementation Details
-
-### React Flow Integration
-
-All canvas components must be wrapped in a `ReactFlowProvider`. The project uses a custom `TestWrapper` component for testing that handles this automatically.
-
-### State Management
-
-Workflow state is centralized in a Zustand store (`useWorkflowStore`). All node and edge operations go through this store to ensure consistent state across the application.
-
-### MSW API Mocking
-
-In development mode, MSW intercepts API requests and returns mock data:
-
-- `GET /automations` — Returns available automation actions
-- `POST /simulate` — Returns simulated workflow execution steps
-
-### Form Updates
-
-Form components receive a `nodeId` and `data` prop. Changes are written back to the Zustand store via `updateNode`. The form panel reads from the store when a node is selected.
-
----
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `VITE_API_BASE_URL` | Base URL for API requests | `/api` |
-
----
-
-## Data Flow
+## Folder Structure
 
 ```
-User Action → Form Component → useWorkflowStore.updateNode()
-                                        ↓
-                              React Flow Canvas Re-renders
-                                        ↓
-                              Sidebar/CanvasToolbar reflect state
+src/
+├── api/              → Fetch wrappers (automations, simulate, analyze)
+├── components/
+│   ├── canvas/       → ReactFlow canvas, toolbar, sidebar
+│   ├── nodes/        → Custom node components + registry
+│   ├── forms/        → Per-node config forms + reusable KeyValueInput
+│   ├── sandbox/      → Simulation panel, execution log, validation banner
+│   └── ai/           → AI analysis panel + insight cards
+├── hooks/            → Zustand store, simulation, validation, AI hooks
+├── mocks/            → MSW handlers + mock data
+├── types/            → Node types, workflow types, API types
+└── utils/            → Graph serializer, cycle detector, validator
 ```
 
 ---
 
-*Built as part of Tredence Studio — Full Stack Engineering Intern (AI Agentic Platforms) Case Study*
+## Tech Stack
+
+| Layer | Choice | Why |
+|---|---|---|
+| Framework | Vite + React 19 + TypeScript | Fast, modern |
+| Canvas | @xyflow/react (React Flow v12) | Visual node-based workflow designer |
+| Styling | Tailwind CSS v3 | Required by spec |
+| State | Zustand | Selector-based, prevents drag re-renders |
+| Mock API | MSW v2 | No extra server process |
+| AI | Multi-provider (Anthropic, Gemini, MiniMax) | Direct fetch, no SDK |
+| Icons | Lucide React | Clean, tree-shakable |
+
+---
+
+## Deliverables Checklist
+
+| Deliverable | Status |
+|---|---|
+| React application (Vite + React 19 + TypeScript) | ✅ |
+| React Flow canvas — 5 custom node types | ✅ |
+| Node config forms (all 5 types, dynamic fields) | ✅ |
+| Mock API (`GET /automations`, `POST /simulate`) via MSW | ✅ |
+| Workflow Test/Sandbox panel with execution log | ✅ |
+| Graph validation (start/end/cycles/disconnected) | ✅ |
+| Export / Import workflow as JSON | ✅ (bonus) |
+| Minimap + zoom controls | ✅ (bonus) |
+| Validation errors shown on nodes | ✅ (bonus) |
+| AI workflow analysis via LLM | ✅ (bonus) |
+| README with architecture, design choices, assumptions | ✅ |
