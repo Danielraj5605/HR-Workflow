@@ -1,73 +1,165 @@
-# React + TypeScript + Vite
+# FlowForge HR — Workflow Designer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A visual HR workflow designer built with React, TypeScript, and React Flow. Design, validate, and simulate HR workflows with an intuitive drag-and-drop canvas.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Category | Technology |
+|----------|------------|
+| Framework | React 19 + TypeScript + Vite |
+| Flow Canvas | @xyflow/react (React Flow v12) |
+| Styling | Tailwind CSS |
+| State Management | Zustand |
+| Testing | Jest + React Testing Library |
+| API Mocking | MSW (Mock Service Worker) |
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Project Structure
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── api/                      # API integrations
+├── components/
+│   ├── ai/                   # AI analysis panel
+│   ├── canvas/               # Sidebar, WorkflowCanvas, CanvasToolbar
+│   ├── forms/                # Node configuration forms
+│   ├── nodes/                # Custom React Flow node components
+│   └── sandbox/              # Simulation panel & execution log
+├── hooks/                    # Custom React hooks
+├── mocks/                    # MSW handlers for API mocking
+├── types/                    # TypeScript type definitions
+└── utils/                    # Utility functions (validation, serialization)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Setup
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
+
+- Node.js 18+
+- npm 9+
+
+### Installation
+
+```bash
+# Clone the repository
+cd "D:\Personal Projects\HR Workflow"
+
+# Install dependencies
+npm install
 ```
+
+### Running the Development Server
+
+```bash
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`. In development mode, MSW (Mock Service Worker) is automatically started to mock API responses.
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+---
+
+## Features
+
+### Workflow Canvas
+
+- **Drag-and-drop** node placement from sidebar
+- **5 Node Types**: Start, Task, Approval, Automated Step, End
+- **Visual connections** between nodes with React Flow edges
+- **Selection** and editing via right panel forms
+- **Delete** nodes and edges via keyboard or UI
+
+### Node Configuration Forms
+
+- **StartForm**: Label and metadata configuration
+- **TaskForm**: Label, description, assignee, due date, custom fields
+- **ApprovalForm**: Approver role, approver name, auto-approve threshold, rejection action
+- **AutomatedStepForm**: Dynamic action selection with API-fetched parameters
+- **EndForm**: End message and summary toggle
+
+### Simulation Panel
+
+- **Run Simulation** against mock API
+- **Step-by-step execution log** with status indicators
+- **Validation banner** showing workflow errors/warnings before simulation
+- **Cycle detection** and validation errors
+
+### AI Analysis Panel
+
+- Generate AI insights on workflow structure
+- Provider-agnostic architecture for LLM integration
+
+---
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server with MSW |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run all Jest tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage report |
+
+---
+
+## Key Implementation Details
+
+### React Flow Integration
+
+All canvas components must be wrapped in a `ReactFlowProvider`. The project uses a custom `TestWrapper` component for testing that handles this automatically.
+
+### State Management
+
+Workflow state is centralized in a Zustand store (`useWorkflowStore`). All node and edge operations go through this store to ensure consistent state across the application.
+
+### MSW API Mocking
+
+In development mode, MSW intercepts API requests and returns mock data:
+
+- `GET /automations` — Returns available automation actions
+- `POST /simulate` — Returns simulated workflow execution steps
+
+### Form Updates
+
+Form components receive a `nodeId` and `data` prop. Changes are written back to the Zustand store via `updateNode`. The form panel reads from the store when a node is selected.
+
+---
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_API_BASE_URL` | Base URL for API requests | `/api` |
+
+---
+
+## Data Flow
+
+```
+User Action → Form Component → useWorkflowStore.updateNode()
+                                        ↓
+                              React Flow Canvas Re-renders
+                                        ↓
+                              Sidebar/CanvasToolbar reflect state
+```
+
+---
+
+*Built as part of Tredence Studio — Full Stack Engineering Intern (AI Agentic Platforms) Case Study*
