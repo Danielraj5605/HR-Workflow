@@ -19,8 +19,9 @@ export default function ApprovalForm({ nodeId, data }: ApprovalFormProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div>
-        <label className="form-label">Label</label>
+        <label className="form-label" htmlFor="approval-label">Label</label>
         <input
+          id="approval-label"
           className="form-input"
           value={data.label}
           onChange={e => set({ label: e.target.value })}
@@ -29,8 +30,9 @@ export default function ApprovalForm({ nodeId, data }: ApprovalFormProps) {
       </div>
 
       <div>
-        <label className="form-label">Approver Role</label>
+        <label className="form-label" htmlFor="approval-role">Approver Role</label>
         <select
+          id="approval-role"
           className="form-select"
           value={data.approverRole}
           onChange={e => set({ approverRole: e.target.value as ApprovalNodeData['approverRole'] })}
@@ -42,8 +44,9 @@ export default function ApprovalForm({ nodeId, data }: ApprovalFormProps) {
       </div>
 
       <div>
-        <label className="form-label">Approver Name <span style={{ color: '#475569', textTransform: 'none', fontWeight: 400 }}>(optional)</span></label>
+        <label className="form-label" htmlFor="approval-name">Approver Name <span style={{ color: '#475569', textTransform: 'none', fontWeight: 400 }}>(optional)</span></label>
         <input
+          id="approval-name"
           className="form-input"
           value={data.approverName ?? ''}
           onChange={e => set({ approverName: e.target.value })}
@@ -52,8 +55,9 @@ export default function ApprovalForm({ nodeId, data }: ApprovalFormProps) {
       </div>
 
       <div>
-        <label className="form-label">Rejection Logic</label>
+        <label className="form-label" htmlFor="approval-rejection">Rejection Logic</label>
         <select
+          id="approval-rejection"
           className="form-select"
           value={data.rejectionAction ?? 'reject'}
           onChange={e => set({ rejectionAction: e.target.value as ApprovalNodeData['rejectionAction'] })}
@@ -65,10 +69,11 @@ export default function ApprovalForm({ nodeId, data }: ApprovalFormProps) {
       </div>
 
       <div>
-        <label className="form-label">
+        <label className="form-label" htmlFor="approval-timeout">
           Timeout (days)
         </label>
         <input
+          id="approval-timeout"
           className="form-input"
           type="number"
           min={0}

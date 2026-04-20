@@ -19,8 +19,9 @@ export default function EndForm({ nodeId, data }: EndFormProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div>
-        <label className="form-label">Label</label>
+        <label className="form-label" htmlFor="end-label">Label</label>
         <input
+          id="end-label"
           className="form-input"
           value={data.label}
           onChange={e => set({ label: e.target.value })}
@@ -29,8 +30,9 @@ export default function EndForm({ nodeId, data }: EndFormProps) {
       </div>
 
       <div>
-        <label className="form-label">End Message</label>
+        <label className="form-label" htmlFor="end-message">End Message</label>
         <textarea
+          id="end-message"
           className="form-textarea"
           rows={3}
           value={data.endMessage}

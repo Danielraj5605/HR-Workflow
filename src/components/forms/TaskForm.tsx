@@ -20,8 +20,9 @@ export default function TaskForm({ nodeId, data }: TaskFormProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div>
-        <label className="form-label">Label</label>
+        <label className="form-label" htmlFor="task-label">Label</label>
         <input
+          id="task-label"
           className="form-input"
           value={data.label}
           onChange={e => set({ label: e.target.value })}
@@ -30,8 +31,9 @@ export default function TaskForm({ nodeId, data }: TaskFormProps) {
       </div>
 
       <div>
-        <label className="form-label">Description</label>
+        <label className="form-label" htmlFor="task-description">Description</label>
         <textarea
+          id="task-description"
           className="form-textarea"
           rows={3}
           value={data.description}
@@ -41,8 +43,9 @@ export default function TaskForm({ nodeId, data }: TaskFormProps) {
       </div>
 
       <div>
-        <label className="form-label">Assignee</label>
+        <label className="form-label" htmlFor="task-assignee">Assignee</label>
         <input
+          id="task-assignee"
           className="form-input"
           value={data.assignee}
           onChange={e => set({ assignee: e.target.value })}
@@ -51,8 +54,9 @@ export default function TaskForm({ nodeId, data }: TaskFormProps) {
       </div>
 
       <div>
-        <label className="form-label">Due Date</label>
+        <label className="form-label" htmlFor="task-due-date">Due Date</label>
         <input
+          id="task-due-date"
           className="form-input"
           type="date"
           value={data.dueDate}

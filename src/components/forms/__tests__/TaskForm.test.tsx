@@ -1,8 +1,7 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TestWrapper } from '../../../testUtils/TestWrapper';
-import userEvent from '@testing-library/user-event';
 import TaskForm from '../TaskForm';
 import type { TaskNodeData } from '../../../types/nodes';
 import { useWorkflowStore } from '../../../hooks/useWorkflowStore';
@@ -20,6 +19,11 @@ const defaultData: TaskNodeData = {
 
 describe('TaskForm', () => {
   beforeEach(() => {
+    useWorkflowStore.getState().clearWorkflow();
+    useWorkflowStore.getState().addNode('task', { x: 0, y: 0 });
+  });
+
+  afterEach(() => {
     useWorkflowStore.getState().clearWorkflow();
   });
 
@@ -46,17 +50,23 @@ describe('TaskForm', () => {
   });
 
   describe('TF-03: Assignee field accepts string input', () => {
-    it('should render assignee input', async () => {
-      const user = userEvent.setup();
+    it('should update assignee value on change', async () => {
+      const nodes = useWorkflowStore.getState().nodes;
+      const nodeId = nodes[0]?.id ?? 'test';
+
       const { getByLabelText } = render(
         <Wrapper>
-          <TaskForm nodeId="test" data={defaultData} />
+          <TaskForm nodeId={nodeId} data={nodes[0]?.data as TaskNodeData ?? defaultData} />
         </Wrapper>
       );
-      const input = getByLabelText(/Assignee/i);
-      await user.clear(input);
-      await user.type(input, 'Alice Smith');
-      expect((input as HTMLInputElement).value).toBe('Alice Smith');
+      const input = getByLabelText(/Assignee/i) as HTMLInputElement;
+
+      fireEvent.change(input, { target: { value: 'Alice Smith' } });
+
+      await waitFor(() => {
+        const updatedNode = useWorkflowStore.getState().getNodeById(nodeId);
+        expect(updatedNode?.data.assignee).toBe('Alice Smith');
+      });
     });
   });
 
@@ -72,18 +82,23 @@ describe('TaskForm', () => {
   });
 
   describe('TF-08: All fields update form state correctly', () => {
-    it('should update all fields', async () => {
-      const user = userEvent.setup();
+    it('should update label on change', async () => {
+      const nodes = useWorkflowStore.getState().nodes;
+      const nodeId = nodes[0]?.id ?? 'test';
+
       const { getByLabelText } = render(
         <Wrapper>
-          <TaskForm nodeId="test" data={defaultData} />
+          <TaskForm nodeId={nodeId} data={nodes[0]?.data as TaskNodeData ?? defaultData} />
         </Wrapper>
       );
+      const input = getByLabelText(/Label/i) as HTMLInputElement;
 
-      const labelInput = getByLabelText(/Label/i);
-      await user.clear(labelInput);
-      await user.type(labelInput, 'Updated Task');
-      expect((labelInput as HTMLInputElement).value).toBe('Updated Task');
+      fireEvent.change(input, { target: { value: 'Updated Task' } });
+
+      await waitFor(() => {
+        const updatedNode = useWorkflowStore.getState().getNodeById(nodeId);
+        expect(updatedNode?.data.label).toBe('Updated Task');
+      });
     });
   });
 });

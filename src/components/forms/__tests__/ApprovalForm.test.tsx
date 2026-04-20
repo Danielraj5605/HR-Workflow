@@ -1,8 +1,7 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TestWrapper } from '../../../testUtils/TestWrapper';
-import userEvent from '@testing-library/user-event';
 import ApprovalForm from '../ApprovalForm';
 import type { ApprovalNodeData } from '../../../types/nodes';
 import { useWorkflowStore } from '../../../hooks/useWorkflowStore';
@@ -21,6 +20,11 @@ const defaultData: ApprovalNodeData = {
 describe('ApprovalForm', () => {
   beforeEach(() => {
     useWorkflowStore.getState().clearWorkflow();
+    useWorkflowStore.getState().addNode('approval', { x: 0, y: 0 });
+  });
+
+  afterEach(() => {
+    useWorkflowStore.getState().clearWorkflow();
   });
 
   describe('AF-01: Title field renders and is required', () => {
@@ -36,28 +40,38 @@ describe('ApprovalForm', () => {
 
   describe('AF-02: Approver role dropdown has correct options', () => {
     it('should have Manager, HRBP, Director options', () => {
-      const { getByRole } = render(
+      const { getByLabelText } = render(
         <Wrapper>
           <ApprovalForm nodeId="test" data={defaultData} />
         </Wrapper>
       );
-      const select = getByRole('combobox');
+      const select = getByLabelText(/Approver Role/i) as HTMLSelectElement;
       expect(select).toBeInTheDocument();
-      expect(select.children.length).toBeGreaterThanOrEqual(3);
+      expect(select.options.length).toBeGreaterThanOrEqual(3);
+      expect(select.options[0].value).toBe('Manager');
+      expect(select.options[1].value).toBe('HRBP');
+      expect(select.options[2].value).toBe('Director');
     });
   });
 
   describe('AF-03: Approver role selection updates state', () => {
     it('should update approver role value on change', async () => {
-      const user = userEvent.setup();
-      const { getByRole } = render(
+      const nodes = useWorkflowStore.getState().nodes;
+      const nodeId = nodes[0]?.id ?? 'test';
+
+      const { getByLabelText } = render(
         <Wrapper>
-          <ApprovalForm nodeId="test" data={defaultData} />
+          <ApprovalForm nodeId={nodeId} data={nodes[0]?.data as ApprovalNodeData ?? defaultData} />
         </Wrapper>
       );
-      const select = getByRole('combobox') as HTMLSelectElement;
-      await user.selectOptions(select, 'HRBP');
-      expect(select.value).toBe('HRBP');
+      const select = getByLabelText(/Approver Role/i) as HTMLSelectElement;
+
+      fireEvent.change(select, { target: { value: 'HRBP' } });
+
+      await waitFor(() => {
+        const updatedNode = useWorkflowStore.getState().getNodeById(nodeId);
+        expect(updatedNode?.data.approverRole).toBe('HRBP');
+      });
     });
   });
 

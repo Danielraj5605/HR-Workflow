@@ -1,8 +1,7 @@
 import React from 'react';
-import { render, act } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TestWrapper } from '../../../testUtils/TestWrapper';
-import userEvent from '@testing-library/user-event';
 import StartForm from '../StartForm';
 import type { StartNodeData } from '../../../types/nodes';
 import { useWorkflowStore } from '../../../hooks/useWorkflowStore';
@@ -14,6 +13,7 @@ const defaultData: StartNodeData = { type: 'start', label: 'Start', metadata: {}
 describe('StartForm', () => {
   beforeEach(() => {
     useWorkflowStore.getState().clearWorkflow();
+    useWorkflowStore.getState().addNode('start', { x: 0, y: 0 });
   });
 
   afterEach(() => {
@@ -33,19 +33,25 @@ describe('StartForm', () => {
 
   describe('SF-02: Title input is required — shows error on empty submit', () => {
     it('should update label value on change', async () => {
-      const { getByRole } = render(
+      const nodes = useWorkflowStore.getState().nodes;
+      const nodeId = nodes[0]?.id ?? 'test';
+
+      const { getByRole, rerender } = render(
         <Wrapper>
-          <StartForm nodeId="test" data={defaultData} />
+          <StartForm nodeId={nodeId} data={nodes[0]?.data as StartNodeData ?? defaultData} />
         </Wrapper>
       );
+
       const input = getByRole('textbox', { name: /label/i }) as HTMLInputElement;
 
-      await act(async () => {
-        await userEvent.clear(input);
-        await userEvent.type(input, 'New Start');
-      });
+      // Use fireEvent which directly dispatches to DOM
+      fireEvent.change(input, { target: { value: 'New Start' } });
 
-      expect(input.value).toBe('New Start');
+      // Verify store was updated
+      await waitFor(() => {
+        const updatedNode = useWorkflowStore.getState().getNodeById(nodeId);
+        expect(updatedNode?.data.label).toBe('New Start');
+      });
     });
   });
 
@@ -62,19 +68,23 @@ describe('StartForm', () => {
 
   describe('SF-05: onChange fires with updated values', () => {
     it('should have label input that responds to changes', async () => {
-      const { getByRole } = render(
+      const nodes = useWorkflowStore.getState().nodes;
+      const nodeId = nodes[0]?.id ?? 'test';
+
+      const { getByRole, rerender } = render(
         <Wrapper>
-          <StartForm nodeId="test" data={defaultData} />
+          <StartForm nodeId={nodeId} data={nodes[0]?.data as StartNodeData ?? defaultData} />
         </Wrapper>
       );
+
       const input = getByRole('textbox', { name: /label/i }) as HTMLInputElement;
 
-      await act(async () => {
-        await userEvent.clear(input);
-        await userEvent.type(input, 'Test Label');
-      });
+      fireEvent.change(input, { target: { value: 'Test Label' } });
 
-      expect(input.value).toBe('Test Label');
+      await waitFor(() => {
+        const updatedNode = useWorkflowStore.getState().getNodeById(nodeId);
+        expect(updatedNode?.data.label).toBe('Test Label');
+      });
     });
   });
 

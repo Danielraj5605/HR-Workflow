@@ -1,8 +1,7 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TestWrapper } from '../../../testUtils/TestWrapper';
-import userEvent from '@testing-library/user-event';
 import EndForm from '../EndForm';
 import type { EndNodeData } from '../../../types/nodes';
 import { useWorkflowStore } from '../../../hooks/useWorkflowStore';
@@ -18,6 +17,11 @@ const defaultData: EndNodeData = {
 
 describe('EndForm', () => {
   beforeEach(() => {
+    useWorkflowStore.getState().clearWorkflow();
+    useWorkflowStore.getState().addNode('end', { x: 0, y: 0 });
+  });
+
+  afterEach(() => {
     useWorkflowStore.getState().clearWorkflow();
   });
 
@@ -45,31 +49,46 @@ describe('EndForm', () => {
 
   describe('EF-03: Summary flag toggles correctly', () => {
     it('should toggle showSummary on click', async () => {
-      const user = userEvent.setup();
-      const { getByText } = render(
+      const nodes = useWorkflowStore.getState().nodes;
+      const nodeId = nodes[0]?.id ?? 'test';
+
+      const { container } = render(
         <Wrapper>
-          <EndForm nodeId="test" data={defaultData} />
+          <EndForm nodeId={nodeId} data={nodes[0]?.data as EndNodeData ?? defaultData} />
         </Wrapper>
       );
-      const toggle = getByText(/Show Summary on Completion/i);
-      await user.click(toggle);
-      // The toggle state changes internally via store update
-      expect(toggle).toBeInTheDocument();
+
+      // The toggle is a div with onClick
+      const toggle = container.querySelector('[style*="border-radius: 10"]');
+      if (toggle) {
+        fireEvent.click(toggle);
+      }
+
+      await waitFor(() => {
+        const updatedNode = useWorkflowStore.getState().getNodeById(nodeId);
+        expect(updatedNode?.data.showSummary).toBe(false);
+      });
     });
   });
 
   describe('EF-04: End message updates state on change', () => {
     it('should update end message value', async () => {
-      const user = userEvent.setup();
+      const nodes = useWorkflowStore.getState().nodes;
+      const nodeId = nodes[0]?.id ?? 'test';
+
       const { getByLabelText } = render(
         <Wrapper>
-          <EndForm nodeId="test" data={defaultData} />
+          <EndForm nodeId={nodeId} data={nodes[0]?.data as EndNodeData ?? defaultData} />
         </Wrapper>
       );
-      const textarea = getByLabelText(/End Message/i);
-      await user.clear(textarea);
-      await user.type(textarea, 'Process Complete');
-      expect((textarea as HTMLTextAreaElement).value).toBe('Process Complete');
+      const textarea = getByLabelText(/End Message/i) as HTMLTextAreaElement;
+
+      fireEvent.change(textarea, { target: { value: 'Process Complete' } });
+
+      await waitFor(() => {
+        const updatedNode = useWorkflowStore.getState().getNodeById(nodeId);
+        expect(updatedNode?.data.endMessage).toBe('Process Complete');
+      });
     });
   });
 });

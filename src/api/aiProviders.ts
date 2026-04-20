@@ -65,13 +65,13 @@ export const AI_PROVIDERS: AIProviderConfig[] = [
     logo: '🟡',
     color: '#f59e0b',
     envKey: 'VITE_MINIMAX_API_KEY',
-    placeholder: 'eyJ…',
-    docsUrl: 'https://platform.minimaxi.com/',
-    defaultModel: 'abab6.5s-chat',
+    placeholder: 'sk-cp-…',
+    docsUrl: 'https://platform.minimax.io/',
+    defaultModel: 'MiniMax-M2.7',
     models: [
-      { id: 'abab6.5s-chat', label: 'abab6.5s',   description: 'Fast & low cost' },
-      { id: 'abab6.5-chat',  label: 'abab6.5',    description: 'High quality' },
-      { id: 'abab5.5-chat',  label: 'abab5.5',    description: 'Legacy' },
+      { id: 'MiniMax-M2.7',    label: 'MiniMax M2.7',    description: 'Fast & powerful' },
+      { id: 'MiniMax-Text-01', label: 'MiniMax Text-01', description: '1M context window' },
+      { id: 'MiniMax-M1',      label: 'MiniMax M1',      description: 'Reasoning model' },
     ],
   },
 ];
@@ -168,7 +168,7 @@ async function callGemini(apiKey: string, model: string, prompt: string): Promis
 
 async function callMiniMax(apiKey: string, model: string, prompt: string): Promise<string> {
   // /api/minimax is proxied by Vite → https://api.minimax.io (international)
-  // Uses the OpenAI-compatible endpoint
+  // OpenAI-compatible endpoint
   const res = await fetch('/api/minimax/v1/chat/completions', {
     method: 'POST',
     headers: {

@@ -20,7 +20,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api\/gemini/, ''),
         secure: true,
       },
-      // MiniMax (international)  →  https://api.minimax.io
+      // MiniMax (international platform — api.minimax.io, for MiniMax-M2.7 / MiniMax-Text-01 keys)
       '/api/minimax': {
         target: 'https://api.minimax.io',
         changeOrigin: true,
